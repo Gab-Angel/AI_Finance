@@ -2,7 +2,6 @@ import os
 from deepagents import create_deep_agent
 from langchain_groq import ChatGroq
 from src.parser.ofx_parser import parse_ofx
-from src.tools.tools import categorize_transactions
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -34,18 +33,32 @@ agent = create_deep_agent(
     skills=["../skills/"] 
 )
 
+
+def analyze_transactions(transactions: list) -> str:
+    result = agent.invoke({
+            "messages": [{
+                "role": "user",
+                "content": f"""
+    Analise as transações: {transactions}
+    """
+            }]
+        })
+
+    resposta_final = result["messages"][-1]
+    return resposta_final.content
+
 # Testar
 if __name__ == "__main__":
     
     
     # Parse do OFX
     data = parse_ofx('/home/angel/python/AI_Finance/extrato.ofx')
-    
+    transactions = data['transactions']
     # Invocar agente
     result = agent.invoke({
         "messages": [{
             "role": "user",
-            "content": f"Analise estas transações: {data['transactions']}"
+            "content": f"Analise estas transações: {transactions}"
         }]
     })
     
