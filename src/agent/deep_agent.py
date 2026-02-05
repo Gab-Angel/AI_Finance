@@ -7,20 +7,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Configurar logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-# Configurar LLM
 llm = ChatGroq(
     model="openai/gpt-oss-120b",
     temperature=0.1,
     api_key=os.getenv("GROQ_API_KEY")
 )
 
-# System prompt
 system_prompt = """
 Você é um analista financeiro especializado em finanças pessoais.
 
@@ -33,7 +30,6 @@ Analise estas transações seguindo TODAS as skills disponíveis:
 IMPORTANTE: Siga exatamente o formato do report_template.md
 """
 
-# Criar Deep Agent
 agent = create_deep_agent(
     model=llm,
     system_prompt=system_prompt,
@@ -42,7 +38,6 @@ agent = create_deep_agent(
 
 
 def analyze_transactions(transactions: list) -> str:
-    """Analisa transações usando o Deep Agent"""
     logging.info(f"Analisando {len(transactions)} transações...")
     
     result = agent.invoke({
@@ -59,7 +54,6 @@ Analise estas Transações: {transactions}
     return resposta_final.content
 
 
-# Testar
 if __name__ == "__main__":
 
     data = parse_ofx('/home/angel/python/AI_Finance/extrato.ofx')
@@ -103,4 +97,3 @@ Forneça análise de gastos, categorização e insights.
     print(f'   • Tokens entrada: {token_usage.get("prompt_tokens", "N/A")}')
     print(f'   • Tokens saída: {token_usage.get("completion_tokens", "N/A")}')
     print(f'   • Total tokens: {token_usage.get("total_tokens", "N/A")}')
-    print(result)

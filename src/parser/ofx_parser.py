@@ -4,15 +4,13 @@ from pathlib import Path
 from typing import Dict, Any
 
 def parse_ofx(file_path: str) -> Dict[str, Any]:
-    """Parse OFX file to structured data"""
     
-    with open(file_path, 'rb') as f:  # Modo binário
+    with open(file_path, 'rb') as f: 
         ofx = ofxparse.OfxParser.parse(f)
     
     account = ofx.account
     statement = account.statement
     
-    # Transações
     transactions = []
     for trn in statement.transactions:
         transactions.append({

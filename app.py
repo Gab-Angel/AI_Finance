@@ -20,27 +20,23 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file:
     with st.spinner("Lendo extrato e analisando com IA..."):
-        # Salva OFX temporário
+       
         with tempfile.NamedTemporaryFile(delete=False, suffix=".ofx") as tmp:
             tmp.write(uploaded_file.read())
             tmp_path = tmp.name
 
         try:
-            # Parse do OFX
             parsed = parse_ofx(tmp_path)
 
             df_transactions = parsed["transactions"]
             metadata = parsed["metadata"]
 
-            # Mostra resumo rápido
             st.subheader("📌 Informações da Conta")
             st.json(metadata)
 
-            # Preview das transações
             with st.expander("📄 Ver transações"):
                 st.dataframe(df_transactions, use_container_width=True)
 
-            # IA → converte DF para algo serializável
             transactions_for_ai = df_transactions.reset_index().to_dict(
                 orient="records"
             )
