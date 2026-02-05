@@ -324,7 +324,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 👤 Autor
 
-**Seu Nome**
+**Gabriel Angel**
 - GitHub: [@Gab-Angel](https://github.com/Gab-Angel)
 - LinkedIn: [Gabriel Angel](https://www.linkedin.com/in/gabriel-angel-9277663a0)
 
