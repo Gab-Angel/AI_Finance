@@ -1,7 +1,7 @@
 import os
-
-import streamlit as st
 import tempfile
+import streamlit as st
+
 
 from src.parser.ofx_parser import parse_ofx
 from src.agent.deep_agent import analyze_transactions
@@ -14,31 +14,44 @@ st.set_page_config(
 st.title("📊 Análise de Extrato Bancário com IA")
 
 uploaded_file = st.file_uploader(
-    "Faça upload do seu extrato bancário (.ofx)",
+    "Faça upload do extrato bancário (.ofx)",
     type=["ofx"]
 )
 
 if uploaded_file:
-    with st.spinner("Processando extrato e analisando com IA..."):
-        # Salva arquivo temporário
+    with st.spinner("Lendo extrato e analisando com IA..."):
+        # Salva OFX temporário
         with tempfile.NamedTemporaryFile(delete=False, suffix=".ofx") as tmp:
             tmp.write(uploaded_file.read())
             tmp_path = tmp.name
 
         try:
-            # Parse OFX
-            data = parse_ofx(tmp_path)
+            # Parse do OFX
+            parsed = parse_ofx(tmp_path)
 
-            # IA analisa
-            markdown_report = analyze_transactions(data["transactions"])
+            df_transactions = parsed["transactions"]
+            metadata = parsed["metadata"]
+
+            # Mostra resumo rápido
+            st.subheader("📌 Informações da Conta")
+            st.json(metadata)
+
+            # Preview das transações
+            with st.expander("📄 Ver transações"):
+                st.dataframe(df_transactions, use_container_width=True)
+
+            # IA → converte DF para algo serializável
+            transactions_for_ai = df_transactions.reset_index().to_dict(
+                orient="records"
+            )
+
+            markdown_report = analyze_transactions(transactions_for_ai)
 
             st.success("Análise concluída!")
 
-            # Renderiza Markdown
             st.markdown("---")
             st.markdown(markdown_report)
 
-            # Botão para download
             st.download_button(
                 label="⬇️ Baixar relatório (.md)",
                 data=markdown_report,

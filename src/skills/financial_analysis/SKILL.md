@@ -1,26 +1,28 @@
 ---
 name: financial_analysis
-description: Use esta skill para analisar transações financeiras de extratos bancários OFX. Categoriza gastos, identifica padrões e calcula métricas essenciais.
+description: Use esta skill para categorizar transações financeiras de extratos bancários OFX.
 ---
 
 # financial_analysis
 
 ## Overview
 
-Esta skill fornece instruções para analisar extratos bancários no formato JSON estruturado, categorizando transações e calculando métricas financeiras.
+Esta skill fornece instruções para categorizar transações financeiras baseado na descrição de cada transação.
 
 ## Instructions
 
-### 1. Receber e Validar Dados
+### 1. Receber Dados
 
-Quando receber um JSON com transações, primeiro valide:
-- Cada transação tem: id, date, type, amount, description
-- Valores monetários são numéricos
-- Datas estão no formato YYYY-MM-DD
+Você receberá um DataFrame com as seguintes colunas:
+- `id`: Identificador único da transação
+- `date`: Data da transação
+- `type`: Tipo (credit ou debit)
+- `amount`: Valor da transação
+- `description`: Descrição da transação
 
 ### 2. Categorizar Transações
 
-Categorize cada transação baseado na descrição:
+Sua única tarefa é **categorizar cada transação** baseado na descrição.
 
 **Categorias de receita:**
 - `transferencia_recebida`: Pix recebido, transferências de entrada
@@ -39,60 +41,12 @@ Categorize cada transação baseado na descrição:
 - Seja conservador: se em dúvida, use "outros"
 - Para Pix, veja se é para pessoa física (transferencia) ou empresa (compra/pagamento)
 - "Pagamento de fatura" sempre é categoria "pagamentos"
+- Analise palavra por palavra a descrição para escolher a categoria correta
 
-### 3. Calcular Métricas
+### 3. Output Esperado
 
-Calcule as seguintes métricas:
+Para cada transação, informe apenas a categoria atribuída.
 
-**Totais:**
-- Total de receitas (soma de valores positivos)
-- Total de despesas (soma de valores negativos, em módulo)
-- Saldo líquido (receitas - despesas)
+**NÃO calcule métricas, totais ou percentuais - isso será feito por outra skill.**
 
-**Por categoria:**
-- Total gasto em cada categoria
-- Percentual de cada categoria sobre o total de despesas
-- Número de transações por categoria
-
-**Temporais:**
-- Média de gastos por dia
-- Identificar dias com mais movimentação
-
-### 4. Estruturar Output
-
-Organize a análise em:
-
-```json
-{
-  "resumo_geral": {
-    "total_receitas": 0.00,
-    "total_despesas": 0.00,
-    "saldo_liquido": 0.00,
-    "periodo": "YYYY-MM-DD a YYYY-MM-DD"
-  },
-  "por_categoria": [
-    {
-      "categoria": "nome",
-      "total": 0.00,
-      "percentual": 0.0,
-      "transacoes": 0
-    }
-  ],
-  "transacoes_categorizadas": [
-    {
-      "id": "...",
-      "date": "...",
-      "amount": 0.00,
-      "description": "...",
-      "category": "..."
-    }
-  ]
-}
-```
-
-### 5. Observações Importantes
-
-- Valores de despesa devem ser apresentados em módulo (positivo) nos resumos
-- Percentuais devem ter 1 casa decimal
-- Ordenar categorias por total gasto (maior para menor)
-- Incluir apenas categorias que tiveram transações
+Apenas categorize as transações de forma precisa.
